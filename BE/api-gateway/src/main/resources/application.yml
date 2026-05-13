@@ -1,0 +1,44 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods: "*"
+            allowedHeaders: "*"
+            allowCredentials: true
+
+      routes:
+        - id: auth-service
+          uri: http://localhost:8081
+          predicates:
+            - Path=/api/auth/**
+
+        - id: workspace-service
+          uri: http://localhost:8082
+          predicates:
+            - Path=/api/workspaces/**
+          filters:
+            - JwtAuthFilter
+
+        - id: task-service
+          uri: http://localhost:8083
+          predicates:
+            - Path=/api/tasks/**
+          filters:
+            - JwtAuthFilter
+
+        - id: task-websocket
+          uri: ws://localhost:8083
+          predicates:
+            - Path=/ws/**
+
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
